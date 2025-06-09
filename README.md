@@ -63,7 +63,9 @@ user3@example.com
 3. 以下のコマンドを実行して、CSVファイルからUPNを読み取り、パスワードリセットを実行します：
 
 ```powershell
-.\Read-UserUPNs.ps1 -CsvPath "users.csv" | ForEach-Object { .\Reset-UserPassword.ps1 -UserPrincipalName $_ } | Export-Csv -Path "password_reset_results.csv" -NoTypeInformation -Encoding UTF8
+.\Read-UserUPNs.ps1 -CsvPath "users.csv" `
+     | ForEach-Object { .\Reset-UserPassword.ps1 -UserPrincipalName $_ } `
+     | Export-Csv -Path "password_reset_results.csv" -NoTypeInformation -Encoding UTF8
 ```
 
 4. 作業が完了したら、Microsoft Graphから切断します
