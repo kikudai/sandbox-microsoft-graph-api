@@ -17,10 +17,22 @@ Install-Module Microsoft.Graph.Users -Scope CurrentUser
 
 ## 使用方法
 
-スクリプトを実行する際は、ユーザーのUPN（User Principal Name）を引数として指定します：
+1. Microsoft Graphに接続します：
+
+```powershell
+Connect-MgGraph -Scopes "User.ReadWrite.All"
+```
+
+2. スクリプトを実行します：
 
 ```powershell
 .\Reset-UserPassword.ps1 -UserPrincipalName "user@example.com"
+```
+
+3. 作業が完了したら、Microsoft Graphから切断します：
+
+```powershell
+Disconnect-MgGraph
 ```
 
 ## 機能
@@ -32,5 +44,5 @@ Install-Module Microsoft.Graph.Users -Scope CurrentUser
 ## 注意事項
 
 - スクリプトを実行するには、適切な権限（User.ReadWrite.All）が必要です
-- 初回実行時は、Microsoft Graphへの認証が必要です
+- 接続と切断は手動で行う必要があります
 - 生成されたパスワードは画面に表示されるため、セキュアな環境で実行してください 

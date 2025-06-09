@@ -18,9 +18,6 @@ function Generate-RandomPassword {
 }
 
 try {
-    # Microsoft Graphに接続
-    Connect-MgGraph -Scopes "User.ReadWrite.All"
-
     # ユーザーを検索
     $user = Get-MgUser -Filter "userPrincipalName eq '$UserPrincipalName'"
     
@@ -47,7 +44,4 @@ try {
 } catch {
     Write-Error "エラーが発生しました: $_"
     exit 1
-} finally {
-    # Microsoft Graphから切断
-    Disconnect-MgGraph
 } 
