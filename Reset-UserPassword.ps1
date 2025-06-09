@@ -23,7 +23,7 @@ try {
     
     if ($null -eq $user) {
         Write-Error "ユーザーが見つかりません: $UserPrincipalName"
-        exit 1
+        throw "ユーザーが見つかりません: $UserPrincipalName"
     }
 
     # 新しいパスワードを生成
@@ -43,5 +43,5 @@ try {
 
 } catch {
     Write-Error "エラーが発生しました: $_"
-    exit 1
+    throw $_
 } 
