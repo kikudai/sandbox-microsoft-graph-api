@@ -12,25 +12,42 @@ function Generate-RandomPassword {
     )
     
     $length = 16
-    $chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+"
-    $random = New-Object System.Random
-    $password = ""
     $maxAttempts = 10
     $attempts = 0
 
-    do {
-        $password = ""
-        for ($i = 0; $i -lt $length; $i++) {
-            $password += $chars[$random.Next(0, $chars.Length)]
-        }
-        $attempts++
-    } while (
-        $attempts -lt $maxAttempts -and 
-        ($ExcludeString -and $password -match [regex]::Escape($ExcludeString))
-    )
+    # 文字セットを定義
+    $lowercase = "abcdefghijklmnopqrstuvwxyz"
+    $uppercase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    $numbers = "0123456789"
+    $special = "!@#$%^&*()_+-=[]{}|;:,.<>?"
+    
+    # 各文字セットから最低1文字ずつ使用することを保証
+    $password = ""
+    $password += $lowercase[(Get-Random -Minimum 0 -Maximum $lowercase.Length)]
+    $password += $uppercase[(Get-Random -Minimum 0 -Maximum $uppercase.Length)]
+    $password += $numbers[(Get-Random -Minimum 0 -Maximum $numbers.Length)]
+    $password += $special[(Get-Random -Minimum 0 -Maximum $special.Length)]
+    
+    # 残りの文字をランダムに生成
+    $allChars = $lowercase + $uppercase + $numbers + $special
+    for ($i = $password.Length; $i -lt $length; $i++) {
+        $password += $allChars[(Get-Random -Minimum 0 -Maximum $allChars.Length)]
+    }
+    
+    # パスワードをシャッフル
+    $passwordArray = $password.ToCharArray()
+    $random = New-Object System.Random
+    for ($i = $passwordArray.Length - 1; $i -gt 0; $i--) {
+        $j = $random.Next(0, $i + 1)
+        $temp = $passwordArray[$i]
+        $passwordArray[$i] = $passwordArray[$j]
+        $passwordArray[$j] = $temp
+    }
+    $password = -join $passwordArray
 
-    if ($attempts -eq $maxAttempts) {
-        throw "パスワードの生成に失敗しました。ユーザー名を含まないパスワードを生成できませんでした。"
+    # ユーザー名との重複チェック（大文字小文字を区別しない）
+    if ($ExcludeString -and $password -match [regex]::Escape($ExcludeString)) {
+        throw "パスワードにユーザー名が含まれています。再試行してください。"
     }
 
     return $password
