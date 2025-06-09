@@ -7,13 +7,32 @@ param(
 
 # ランダムなパスワードを生成する関数
 function Generate-RandomPassword {
+    param(
+        [string]$ExcludeString
+    )
+    
     $length = 16
     $chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+"
     $random = New-Object System.Random
     $password = ""
-    for ($i = 0; $i -lt $length; $i++) {
-        $password += $chars[$random.Next(0, $chars.Length)]
+    $maxAttempts = 10
+    $attempts = 0
+
+    do {
+        $password = ""
+        for ($i = 0; $i -lt $length; $i++) {
+            $password += $chars[$random.Next(0, $chars.Length)]
+        }
+        $attempts++
+    } while (
+        $attempts -lt $maxAttempts -and 
+        ($ExcludeString -and $password -match [regex]::Escape($ExcludeString))
+    )
+
+    if ($attempts -eq $maxAttempts) {
+        throw "パスワードの生成に失敗しました。ユーザー名を含まないパスワードを生成できませんでした。"
     }
+
     return $password
 }
 
@@ -26,8 +45,8 @@ try {
         throw "ユーザーが見つかりません: $UserPrincipalName"
     }
 
-    # 新しいパスワードを生成
-    $newPassword = Generate-RandomPassword
+    # ユーザー名を除外して新しいパスワードを生成
+    $newPassword = Generate-RandomPassword -ExcludeString $UserPrincipalName
 
     # パスワードをリセット
     $passwordProfile = @{
@@ -46,6 +65,7 @@ try {
         UPN = $UserPrincipalName
         Status = "Success"
         NewPassword = $newPassword
+        ErrorMessage = ""
         Timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
     }
 
@@ -55,6 +75,7 @@ try {
     [PSCustomObject]@{
         UPN = $UserPrincipalName
         Status = "Error"
+        NewPassword = ""
         ErrorMessage = $_.Exception.Message
         Timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
     }
