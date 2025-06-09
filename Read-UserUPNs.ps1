@@ -2,7 +2,9 @@
 
 param(
     [Parameter(Mandatory=$true)]
-    [string]$CsvPath
+    [string]$CsvPath,
+    [Parameter(Mandatory=$false)]
+    [string]$OutputPath = "password_reset_results.csv"
 )
 
 try {
@@ -20,6 +22,9 @@ try {
         Write-Error "CSVファイルにUPNカラムが存在しません。"
         throw "CSVファイルにUPNカラムが存在しません。"
     }
+
+    # 結果を格納する配列
+    $results = @()
 
     # 各ユーザーのUPNを出力
     foreach ($user in $users) {

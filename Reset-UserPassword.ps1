@@ -41,7 +41,22 @@ try {
     Write-Host "新しいパスワード: $newPassword"
     Write-Host "次回のサインイン時にパスワードの変更が必要です。"
 
+    # 結果をオブジェクトとして出力
+    [PSCustomObject]@{
+        UPN = $UserPrincipalName
+        Status = "Success"
+        NewPassword = $newPassword
+        Timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+    }
+
 } catch {
     Write-Error "エラーが発生しました: $_"
+    # エラー時も結果をオブジェクトとして出力
+    [PSCustomObject]@{
+        UPN = $UserPrincipalName
+        Status = "Error"
+        ErrorMessage = $_.Exception.Message
+        Timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+    }
     throw $_
 } 

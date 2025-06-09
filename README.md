@@ -63,7 +63,7 @@ user3@example.com
 3. 以下のコマンドを実行して、CSVファイルからUPNを読み取り、パスワードリセットを実行します：
 
 ```powershell
-.\Read-UserUPNs.ps1 -CsvPath "users.csv" | ForEach-Object { .\Reset-UserPassword.ps1 -UserPrincipalName $_ }
+.\Read-UserUPNs.ps1 -CsvPath "users.csv" | ForEach-Object { .\Reset-UserPassword.ps1 -UserPrincipalName $_ } | Export-Csv -Path "password_reset_results.csv" -NoTypeInformation -Encoding UTF8
 ```
 
 4. 作業が完了したら、Microsoft Graphから切断します
@@ -75,6 +75,23 @@ user3@example.com
 - 新しいパスワードを画面に表示
 - CSVファイルからの一括処理に対応
 - エラー発生時に処理を即時停止
+- パスワードリセット結果をCSVファイルに出力
+
+## 出力されるCSVファイルの形式
+
+パスワードリセット結果は以下の形式でCSVファイルに出力されます：
+
+```csv
+UPN,Status,NewPassword,ErrorMessage,Timestamp
+user1@example.com,Success,NewPassword123,,2024-03-21 10:30:45
+user2@example.com,Error,,ユーザーが見つかりません,2024-03-21 10:30:46
+```
+
+- UPN: ユーザーのUPN
+- Status: 処理結果（Success/Error）
+- NewPassword: 新しいパスワード（成功時のみ）
+- ErrorMessage: エラーメッセージ（エラー時のみ）
+- Timestamp: 処理実行時刻
 
 ## 注意事項
 
@@ -83,4 +100,5 @@ user3@example.com
 - 生成されたパスワードは画面に表示されるため、セキュアな環境で実行してください
 - CSVファイルは必ずUPNカラムを含む必要があります
 - 空のUPNが検出された場合、処理は即時停止します
-- エラーが発生した場合、残りのUPNの処理は実行されません 
+- エラーが発生した場合、残りのUPNの処理は実行されません
+- 結果のCSVファイルには機密情報（パスワード）が含まれるため、適切に管理してください 
