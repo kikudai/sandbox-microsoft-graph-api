@@ -22,7 +22,7 @@ Install-Module Microsoft.Graph.Users -Scope CurrentUser
 1. Microsoft Graphに接続します：
 
 ```powershell
-Connect-MgGraph -Scopes "User.ReadWrite.All"
+Connect-MgGraph -Scopes "User.ReadWrite.All", "Directory.AccessAsUser.All" -UseDeviceAuthentication
 ```
 
 ```powershell
