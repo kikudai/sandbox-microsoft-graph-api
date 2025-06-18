@@ -1,6 +1,9 @@
 param (
     [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
-    [PSCustomObject]$UserInfo
+    [PSCustomObject]$UserInfo,
+
+    [Parameter(Mandatory = $true)]
+    [string]$SenderUserId
 )
 
 # メール送信設定
@@ -10,11 +13,13 @@ $subject = "【重要】仮パスワードのお知らせ"
 $body = @"
 $($UserInfo.Email) 様
 
-Entra IDの仮パスワードをお送りします。
+Microsoft Entra ID（新IdP）の仮パスワードをお送りします。
 
-仮パスワード: $($UserInfo.Password)
+※重要: この仮パスワードは、メモ帳などにコピーして保存してください。
+（仮パスワード変更時、メール閲覧ができない場合があります）
 
-ログイン後、必ずパスワードを変更してください。
+仮パスワード:
+$($UserInfo.Password)
 
 ---
 このメールは自動送信です。
@@ -22,7 +27,7 @@ Entra IDの仮パスワードをお送りします。
 
 # Graph APIでメール送信
 try {
-    Send-MgUserMail -UserId $UserInfo.Email -BodyParameter @{
+    Send-MgUserMail -UserId $SenderUserId -BodyParameter @{
         Message = @{
             Subject = $subject
             Body = @{
